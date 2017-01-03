@@ -1,6 +1,21 @@
 FROM sequenceiq/hadoop-docker:2.7.1
 MAINTAINER SequenceIQ
 
+USER root
+
+RUN yum clean all; \
+    rpm --rebuilddb; \
+    yum install -y curl which tar sudo openssh-server openssh-clients rsync
+# update libselinux. see https://github.com/sequenceiq/hadoop-docker/issues/14
+RUN yum update -y libselinux
+RUN rpm -e cracklib-dicts --nodeps
+RUN yum install -y cracklib-dicts
+
+
+RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
+RUN echo "UsePAM no" >> /etc/ssh/sshd_config
+RUN echo "Port 22" >> /etc/ssh/sshd_config
+
 # zookeeper
 ENV ZOOKEEPER_VERSION 3.4.6
 RUN curl -s http://mirror.csclub.uwaterloo.ca/apache/zookeeper/zookeeper-$ZOOKEEPER_VERSION/zookeeper-$ZOOKEEPER_VERSION.tar.gz | tar -xz -C /usr/local/
@@ -22,7 +37,7 @@ RUN rm $HBASE_HOME/conf/hbase-site.xml
 ADD hbase-site.xml $HBASE_HOME/conf/hbase-site.xml
 
 # phoenix
-ENV PHOENIX_VERSION 4.8.1
+ENV PHOENIX_VERSION 4.8.2
 RUN curl -s http://apache.mirror.vexxhost.com/phoenix/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR/bin/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR-bin.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR-bin phoenix
 ENV PHOENIX_HOME /usr/local/phoenix
@@ -35,6 +50,24 @@ ADD bootstrap-phoenix.sh /etc/bootstrap-phoenix.sh
 RUN chown root:root /etc/bootstrap-phoenix.sh
 RUN chmod 700 /etc/bootstrap-phoenix.sh
 
+#start ssh
+RUN service sshd start
+
+#User for running the apps
+#RUN useradd --create-home --shell /bin/bash jpvel
+#RUN echo 'jpvel:password' | chpasswd
+#RUN adduser jpvel sudo
+#USER jpvel
+#WORKDIR /home/jpvel
+
 CMD ["/etc/bootstrap-phoenix.sh", "-bash"]
 
-EXPOSE 8765
+# Hdfs ports
+EXPOSE 50010 50020 50070 50075 50090
+# Mapred ports
+EXPOSE 19888
+#Yarn ports
+EXPOSE 8030 8031 8032 8033 8040 8042 8088
+#Other ports
+EXPOSE 49707 22
+EXPOSE 8765 9000 2181
