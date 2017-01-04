@@ -11,6 +11,12 @@ RUN yum update -y libselinux
 RUN rpm -e cracklib-dicts --nodeps
 RUN yum install -y cracklib-dicts
 
+#RUN yum -y update
+#RUN yum groupinstall -y 'development tools'
+#RUN yum install -y zlib-devel bzip2-devel openssl-devel xz-libs wget
+RUN curl -OL http://www.python.org/ftp/python/2.7.8/Python-2.7.8.tar.xz
+RUN tar xf Python-2.7.8.tar.xz
+RUN cd Python-2.7.8;./configure --prefix=/usr/local;make;make altinstall
 
 RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config
 RUN echo "UsePAM no" >> /etc/ssh/sshd_config
