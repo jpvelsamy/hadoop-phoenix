@@ -1,0 +1,60 @@
+MODULE 7 Content
+-Hbase - 29 to 63
+-architecture - 45
+		- google white paper
+		- lexicographically sorted multidimensional map
+			- What if there was a way to host a key + really complex value map reliably for billion rows
+		- Regionservers
+			-Region
+			-Meta region
+			-compaction
+		- WALs
+		- Memstore
+		- HFile
+	- create/drop - 10
+		table
+			- bloomfilter
+			- replication scope
+			- versioning
+			- blocksize
+			- in-memory
+			- block cache
+			
+	- add/modify/delete/get - 15
+	- search - 20
+		- normal
+		- coprocessor
+	- SQL - phoenix - 30
+		-the big picture
+		-create/alter/modify/drop
+		-insert
+		-select count
+		-select count with filter
+		-select with join
+	- Python client - 10
+		-thrift server
+		- thrift api example
+		- why thrift
+	- batch processing - 15
+		import/export/rowcount
+	- pig - 20
+		- load
+		- select with filter
+		- select count with filter
+		- select with join
+		- store
+
+
+URLS of interest
+	- https://hub.docker.com/r/oddpoet/hbase-cdh5/
+	- http://bonsai-master:65010/tablesDetailed.jsp
+	- https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxwcmF2ZWVudGhvdmluYWtlcmV8Z3g6NjNkNzdlNTM0ZGI3ZTRmZg
+	- https://issues.apache.org/jira/browse/HBASE-4176
+	- https://wiki.apache.org/hadoop/Hbase/ThriftApi
+	- http://blog.cloudera.com/blog/2013/09/how-to-use-the-hbase-thrift-interface-part-1/
+	- http://archive.apachecon.com/eu2012/presentations/06-Tuesday/L2L-Big_Data/aceu-2012-HBase-sizing-and-schema-design.pdf
+	- http://hortonworks.com/blog/hbase-blockcache-101/
+	-http://www.slideshare.net/enissoz/hbase-and-hdfs-understanding-filesystem-usage
+
+Coordinates for a cell
+Row key -> Column name -> Version
