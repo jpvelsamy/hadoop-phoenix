@@ -1,0 +1,79 @@
+MODULE 7 Instructions
+
+The odd poet way
+sudo docker run -p 2181:2181 -p 65000:65000 -p 65010:65010 -p 65020:65020 -p 65030:65030 -h bonsai-oddpoet -d oddpoet/hbase-cdh5
+sudo docker cp ~/Downloads/apache-phoenix-4.8.1-HBase-0.98-bin.tar.gz backstabbing_leakey:/tmp
+tar -xvzf apache-phoenix-4.8.1-HBase-0.98-bin.tar.gz
+cd apache-phoenix-4.8.1-HBase-0.98-bin 
+cp phoenix-core-4.8.1-HBase-0.98.jar phoenix-4.8.1-HBase-0.98-server.jar /usr/lib/hbase/lib
+
+service hbase-regionserver stop
+service hbase-master stop
+service zookeeper-server stop
+service zookeeper-server start
+service hbase-master start
+service hbase-regionserver start
+
+The sequence iq way
+sudo docker run -it -h bonsai-phoenix hadoop/phoenix:2.7.1
+
+
+
+create 'orders','client','product'
+put 'orders', 'joe_2013-01-13', 'client:name', 'Joe'
+put 'orders', 'joe_2013-01-13', 'client:address', 'Hillroad 1, SF'
+put 'orders', 'joe_2013-01-13', 'product:title', 'iPhone 5'
+put 'orders', 'joe_2013-01-13', 'product:delivery', '2013-01-13'
+
+put 'orders', 'jane_2013-02-05', 'client:name', 'Jane'
+put 'orders', 'jane_2013-02-05', 'client:address', 'Sunset Drive 42, NY'
+put 'orders', 'jane_2013-02-05', 'product:title', 'Samsung S4'
+put 'orders', 'jane_2013-02-05', 'product:delivery', '2013-05-02'
+
+--Creating a new table
+ CREATE TABLE product(id VARCHAR NOT NULL PRIMARY KEY, name VARCHAR);
+ UPSERT INTO PRODUCT VALUES('1234','LEDTV');
+ select * from product;
+
+--Mapping an existing table
+ CREATE VIEW "orders" (name_date VARCHAR PRIMARY KEY, "client"."address" VARCHAR, "client"."name" VARCHAR, "product"."delivery" VARCHAR ,"product"."title" VARCHAR) ;
+
+
+PIG SAMPLES
+sudo docker run -i -t -h bonsai-pig  ipedrazas/hadoop-pig /etc/bootstrap.sh -bash
+
+
+Start the history server
+$HADOOP_PREFIX/sbin/mr-jobhistory-daemon.sh --config $HADOOP_CONF_DIR start historyserver
+
+
+Pig wordcount  script
+lines = LOAD '/user/root/pig/curation.final.amazon.txt' AS (line:chararray);
+words = FOREACH lines GENERATE FLATTEN(TOKENIZE(line)) as word;
+grouped = GROUP words BY word;
+wordcount = FOREACH grouped GENERATE group, COUNT(words);
+DUMP wordcount;
+
+A sample with a join
+drivers = LOAD '/user/root/pig/drivers.csv' USING PigStorage(',');
+raw_drivers = FILTER drivers BY $0>1;
+drivers_details = FOREACH raw_drivers GENERATE $0 AS driverId, $1 AS name;
+
+timesheet = LOAD '/user/root/pig/timesheet.csv' USING PigStorage(',');
+raw_timesheet = FILTER timesheet by $0>1;
+timesheet_logged = FOREACH raw_timesheet GENERATE $0 AS driverId, $2 AS hours_logged, $3 AS miles_logged, $1 AS week_num;
+
+grp_logged = GROUP timesheet_logged by driverId;
+sum_logged = FOREACH grp_logged GENERATE group as driverId, SUM(timesheet_logged.hours_logged) as sum_hourslogged, SUM(timesheet_logged.miles_logged) as sum_mileslogged;
+
+join_sum_logged = JOIN sum_logged by driverId, drivers_details by driverId;
+join_data = FOREACH join_sum_logged GENERATE $0 as driverId, $4 as name, $1 as hours_logged, $2 as miles_logged;
+dump join_data;
+
+grp_logged_week = GROUP timesheet_logged by driverId, week_num;
+sum_logged = FOREACH grp_logged GENERATE group as driverId, week_num, SUM(timesheet_logged.hours_logged) as sum_hourslogged_perweek, SUM(timesheet_logged.miles_logged) as sum_mileslogged_perweek;
+
+
+
+
+
