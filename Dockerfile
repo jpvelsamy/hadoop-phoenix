@@ -42,6 +42,14 @@ ENV PATH $PATH:$HBASE_HOME/bin
 RUN rm $HBASE_HOME/conf/hbase-site.xml
 ADD hbase-site.xml $HBASE_HOME/conf/hbase-site.xml
 
+#hdfs - permanent data folder
+ENV HDFS_HOME /usr/local/hadoop
+RUN mv $HDFS_HOME/etc/hadoop/hdfs-site.xml $HDFS_HOME/etc/hadoop/hdfs-site.xml.bkup
+ADD hdfs-site.xml $HDFS_HOME/etc/hadoop/hdfs-site.xml
+RUN mkdir -p /root/docker-data/hdfs/name
+RUN mkdir -p /root/docker-data/hdfs/data
+RUN $HADOOP_PREFIX/bin/hdfs namenode -format
+
 # phoenix
 ENV PHOENIX_VERSION 4.8.2
 RUN curl -s http://apache.mirror.vexxhost.com/phoenix/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR/bin/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR-bin.tar.gz | tar -xz -C /usr/local/
