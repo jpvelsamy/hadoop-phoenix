@@ -28,8 +28,8 @@ RUN curl -s http://mirror.csclub.uwaterloo.ca/apache/zookeeper/zookeeper-$ZOOKEE
 RUN cd /usr/local && ln -s ./zookeeper-$ZOOKEEPER_VERSION zookeeper
 ENV ZOO_HOME /usr/local/zookeeper
 ENV PATH $PATH:$ZOO_HOME/bin
-RUN mv $ZOO_HOME/conf/zoo_sample.cfg $ZOO_HOME/conf/zoo.cfg
-RUN mkdir /tmp/zookeeper
+ADD zoo.cfg $ZOO_HOME/conf/zoo.cfg
+RUN mkdir -p /root/docker-data/zookeeper
 
 # hbase
 ENV HBASE_MAJOR 1.2
@@ -48,7 +48,7 @@ RUN mv $HDFS_HOME/etc/hadoop/hdfs-site.xml $HDFS_HOME/etc/hadoop/hdfs-site.xml.b
 ADD hdfs-site.xml $HDFS_HOME/etc/hadoop/hdfs-site.xml
 RUN mkdir -p /root/docker-data/hdfs/name
 RUN mkdir -p /root/docker-data/hdfs/data
-RUN $HADOOP_PREFIX/bin/hdfs namenode -format
+RUN $HDFS_HOME/bin/hdfs namenode -format
 
 # phoenix
 ENV PHOENIX_VERSION 4.8.2

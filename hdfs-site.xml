@@ -9,11 +9,11 @@
     </property>
     <property>
         <name>dfs.name.dir</name>
-        <value>/root/docker-data/hdfs/name</value>
+        <value>file:///root/docker-data/hdfs/name</value>
     </property>
     <property>
         <name>dfs.data.dir</name>
-        <value>/root/docker-data/hdfs/data</value>
+        <value>file:///root/docker-data/hdfs/data</value>
     </property>
 
 </configuration>

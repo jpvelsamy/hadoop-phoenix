@@ -28,5 +28,10 @@
   <property>
     <name>hbase.cluster.distributed</name>
     <value>true</value>
-  </property>
+  </property>  
+  <property>
+      <name>hbase.zookeeper.property.datadir</name>
+      <value>file:///root/docker-data/zookeeper</value>
+      <description>location of storage of zookeeper data</description>
+   </property>
 </configuration>
