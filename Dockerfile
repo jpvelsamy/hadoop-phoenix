@@ -3,13 +3,20 @@ MAINTAINER SequenceIQ
 
 USER root
 
-RUN yum clean all; \
-    rpm --rebuilddb; \
-    yum install -y curl which tar sudo openssh-server openssh-clients rsync
 # update libselinux. see https://github.com/sequenceiq/hadoop-docker/issues/14
-RUN yum update -y libselinux
+RUN yum clean all \
+    && rpm --rebuilddb \
+    && yum install -y curl which tar sudo openssh-server openssh-clients rsync \
+    && yum clean all \
+    && yum update -y libselinux \
+    && yum clean all
+
+
+
+
 RUN rpm -e cracklib-dicts --nodeps
 RUN yum install -y cracklib-dicts
+
 
 #RUN yum -y update
 #RUN yum groupinstall -y 'development tools'
@@ -23,7 +30,7 @@ RUN echo "UsePAM no" >> /etc/ssh/sshd_config
 RUN echo "Port 22" >> /etc/ssh/sshd_config
 
 # zookeeper
-ENV ZOOKEEPER_VERSION 3.4.6
+ENV ZOOKEEPER_VERSION 3.4.11
 RUN curl -s http://mirror.csclub.uwaterloo.ca/apache/zookeeper/zookeeper-$ZOOKEEPER_VERSION/zookeeper-$ZOOKEEPER_VERSION.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./zookeeper-$ZOOKEEPER_VERSION zookeeper
 ENV ZOO_HOME /usr/local/zookeeper
@@ -32,8 +39,8 @@ ADD zoo.cfg $ZOO_HOME/conf/zoo.cfg
 RUN mkdir -p /root/docker-data/zookeeper
 
 # hbase
-ENV HBASE_MAJOR 1.2
-ENV HBASE_MINOR 4
+ENV HBASE_MAJOR 1.3
+ENV HBASE_MINOR 1
 ENV HBASE_VERSION "${HBASE_MAJOR}.${HBASE_MINOR}"
 RUN curl -s http://apache.mirror.gtcomm.net/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./hbase-$HBASE_VERSION hbase
@@ -51,8 +58,8 @@ RUN mkdir -p /root/docker-data/hdfs/data
 RUN $HDFS_HOME/bin/hdfs namenode -format
 
 # phoenix
-ENV PHOENIX_VERSION 4.8.2
-RUN curl -s http://apache.mirror.vexxhost.com/phoenix/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR/bin/apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR-bin.tar.gz | tar -xz -C /usr/local/
+ENV PHOENIX_VERSION 4.13.1
+RUN curl -s http://redrockdigimark.com/apachemirror/phoenix/apache-phoenix-4.13.1-HBase-1.3/bin/apache-phoenix-4.13.1-HBase-1.3-bin.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./apache-phoenix-$PHOENIX_VERSION-HBase-$HBASE_MAJOR-bin phoenix
 ENV PHOENIX_HOME /usr/local/phoenix
 ENV PATH $PATH:$PHOENIX_HOME/bin
