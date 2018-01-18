@@ -42,7 +42,7 @@ RUN mkdir -p /root/docker-data/zookeeper
 ENV HBASE_MAJOR 1.3
 ENV HBASE_MINOR 1
 ENV HBASE_VERSION "${HBASE_MAJOR}.${HBASE_MINOR}"
-RUN curl -s http://apache.mirror.gtcomm.net/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz | tar -xz -C /usr/local/
+RUN curl -s http://www-us.apache.org/dist/hbase/$HBASE_VERSION/hbase-$HBASE_VERSION-bin.tar.gz | tar -xz -C /usr/local/
 RUN cd /usr/local && ln -s ./hbase-$HBASE_VERSION hbase
 ENV HBASE_HOME /usr/local/hbase
 ENV PATH $PATH:$HBASE_HOME/bin
